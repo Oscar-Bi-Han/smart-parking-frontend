@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ParkingLots from "./pages/ParkingLots";
 import LotSpaces from "./pages/LotSpaces";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
   return (
@@ -21,6 +22,10 @@ function App() {
         {/* Auth routes */}
         <Route path="/auth" element={<AuthLayout />}>
           <Route path="/auth/login" element={<Login />} />
+          <Route
+            path="/auth/forgot-password"
+            element={<ForgotPassword />}
+          />
         </Route>
 
         {/* Catch-all for 404 */}
