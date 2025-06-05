@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 
 // Example data for lots and their spaces
 const lots = [
@@ -39,6 +40,22 @@ const LotSpaces = () => {
   const { lotId } = useParams();
   const lot = lots.find((l) => l.id === Number(lotId));
   const [reserved, setReserved] = useState({});
+  const [backendSpaces, setBackendSpaces] = useState([]);
+
+  useEffect(() => {
+    const fetchSpaces = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/user/spaces", {withCredentials: true});
+        setBackendSpaces(response.data);
+        console.log("Fetched spaces from backend:", response.data);
+      } catch (error) {
+        console.error("Error fetching spaces from backend:", error);
+      }
+    };
+
+    fetchSpaces();
+  }, []);
+
   if (!lot) {
     return <div className="py-8 text-center text-lg">Lot not found.</div>;
   }

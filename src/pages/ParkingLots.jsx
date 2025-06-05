@@ -26,7 +26,10 @@ const lots = [
 const ParkingLots = () => {
   return (
     <div className="py-4">
-      <h2 className="text-2xl md:text-4xl font-bold mb-4">Tracked Parking Lots</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl md:text-4xl font-bold ">Tracked Parking Lots</h2>
+        <button className="bg-red-500 p-2 text-white rounded-xl hover:bg-red-600 cursor-pointer transition-colors duration-200">Log Out</button>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:py-5">
         {lots.map((lot) => (
           <Link key={lot.id} to={`/lots/${lot.id}`} className="block">

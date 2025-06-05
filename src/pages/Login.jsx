@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthUser } from "../contexts/AuthUserContext";
 
 const validateEmail = (email) => {
   // Simple email regex
@@ -7,13 +8,14 @@ const validateEmail = (email) => {
 };
 
 const Login = () => {
+  const { login, loading } = useAuthUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!validateEmail(email)) {
@@ -24,7 +26,12 @@ const Login = () => {
       setError("Password must be at least 6 characters.");
       return;
     }
-    // Submit logic here
+    try {
+      await login(email, password);
+      navigate("/");
+    } catch (err) {
+      setError("Invalid email or password.");
+    }
   };
 
   const isFormValid = validateEmail(email) && password.length >= 6;
@@ -64,17 +71,10 @@ const Login = () => {
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-3 rounded disabled:opacity-50  font-semibold shadow-md mt-4 mb-4"
-        disabled={!isFormValid}
-        onClick={() => {
-          if (isFormValid) {
-            navigate('/')
-          } else {
-            setError("Please fill in all fields correctly.");
-          }
-        }}
+        className="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-3 rounded disabled:opacity-50 font-semibold shadow-md mt-4 mb-4"
+        disabled={!isFormValid || loading}
       >
-        Login
+        {loading ? "Logging in..." : "Login"}
       </button>
       <div className="flex justify-end">
         <Link
