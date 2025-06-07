@@ -19,7 +19,7 @@ export const AuthUserProvider = ({ children }) => {
                 console.error('Error fetching authenticated user:', error);
                 setAuthUser(null);
             } finally {
-                setLoading(false);
+                setLoading(false)
             }
         };
 
