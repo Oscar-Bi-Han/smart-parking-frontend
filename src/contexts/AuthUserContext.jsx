@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const AuthUserContext = createContext();
 
 export const AuthUserProvider = ({ children }) => {
@@ -11,7 +13,7 @@ export const AuthUserProvider = ({ children }) => {
         const fetchAuthUser = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('http://localhost:5000/auth/checkauth', { withCredentials: true }); // Endpoint to fetch authenticated user
+                const response = await axios.get(`${API_URL}/auth/checkauth`, { withCredentials: true }); // Endpoint to fetch authenticated user
                 setAuthUser(response.data.user);
             } catch (error) {
                 console.error('Error fetching authenticated user:', error);
@@ -27,7 +29,7 @@ export const AuthUserProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             setLoading(true);
-            const response = await axios.post('http://localhost:5000/auth/login', { email, password },  { withCredentials: true });
+            const response = await axios.post(`${API_URL}/auth/login`, { email, password },  { withCredentials: true });
             setAuthUser(response.data.user);
         } catch (error) {
             console.error('Login error:', error);
@@ -40,7 +42,7 @@ export const AuthUserProvider = ({ children }) => {
     const logout = async () => {
         try {
             setLoading(true);
-            await axios.post('http://localhost:5000/auth/logout',  { withCredentials: true });
+            await axios.post(`${API_URL}/auth/logout`,  { withCredentials: true });
             setAuthUser(null);
         } catch (error) {
             console.error('Logout error:', error);
