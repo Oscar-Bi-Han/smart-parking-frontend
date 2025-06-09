@@ -76,7 +76,7 @@ const Login = () => {
       >
         {loading ? "Logging in..." : "Login"}
       </button>
-      <div className="flex justify-end">
+      <div className="flex">
         <Link
           to="/auth/forgot-password"
           className="text-blue-600 hover:underline text-sm"
@@ -84,6 +84,12 @@ const Login = () => {
           Forgot password?
         </Link>
       </div>
+            <p className="text-sm text-end mt-4">
+          Don't have an account yet?{" "}
+          <a href="/auth/register" className="text-blue-500">
+            Register
+          </a>
+        </p>
     </form>
   );
 };

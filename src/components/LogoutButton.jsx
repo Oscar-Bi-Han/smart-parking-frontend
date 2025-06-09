@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuthUser } from "../contexts/AuthUserContext";
+import toast from 'react-hot-toast';
 
 const LogoutButton = () => {
   const { logout } = useAuthUser();
@@ -10,6 +11,7 @@ const LogoutButton = () => {
       alert("Logged out successfully!");
     } catch (error) {
       console.error("Error during logout:", error);
+      toast.error('Logout failed. Please try again.');
     }
   };
 

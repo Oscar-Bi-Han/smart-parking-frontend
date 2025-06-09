@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { reserveSpace, cancelReservation, fetchSpaces } from "../utils/spacesApi";
 import LogoutButton from "../components/LogoutButton";
+import { useAuthUser } from "../contexts/AuthUserContext";
+import toast from 'react-hot-toast';
 
 const LotSpaces = () => {
   const [loading, setLoading] = useState(true); // Add loading state
   const [reserved, setReserved] = useState({});
   const [backendSpaces, setBackendSpaces] = useState([]);
+  const {authUser} = useAuthUser(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,6 +18,7 @@ const LotSpaces = () => {
         setBackendSpaces(spaces);
       } catch (error) {
         console.error("Error fetching spaces:", error);
+        toast.error('Failed to fetch parking spaces. Please try again.');
       } finally {
         setLoading(false); // Set loading to false after fetching
       }
@@ -36,18 +39,21 @@ const LotSpaces = () => {
     );
   }
 
-  const handleReserve = async (spaceId) => {
+  const handleReserve = async (space) => {
     try {
-      if (reserved[spaceId]) {
-        await cancelReservation(spaceId);
-        console.log(`Reservation canceled for space ID: ${spaceId}`);
+      if (space.reserved === 'true' && space.lastUser === authUser.id) {
+        await cancelReservation(space.id, authUser.id);
+        console.log(`Reservation canceled for space ID: ${space.id}`);
       } else {
-        await reserveSpace(spaceId);
-        console.log(`Space reserved successfully for space ID: ${spaceId}`);
+        await reserveSpace(space.id, authUser.id);
+        console.log(`Space reserved successfully for space ID: ${space.id}`);
       }
-      setReserved((prev) => ({ ...prev, [spaceId]: !prev[spaceId] }));
+      // Fetch spaces again after reservation/unreservation
+      const updatedSpaces = await fetchSpaces();
+      setBackendSpaces(updatedSpaces);
     } catch (error) {
       console.error("Error handling reservation:", error);
+      toast.error('Failed to handle reservation. Please try again.');
     }
   };
 
@@ -67,12 +73,16 @@ const LotSpaces = () => {
             <span className={`text-xs font-semibold ${space.status === 0 ? "text-green-700" : "text-red-600"}`}>
               {space.status === 0 ? "Available" : "Occupied"}
             </span>
-            {space.status === 0 ? (
+            {space.status === 0 && space.reserved === "true" && space.lastUser !== authUser.id ? (
+              <span className="mt-3 px-4 py-1 bg-gray-400 text-white rounded font-semibold text-xs cursor-not-allowed">
+                Reserved
+              </span>
+            ) : space.status === 0 ? (
               <button
-                className={`mt-3 px-4 py-1 rounded font-semibold text-xs transition text-white ${reserved[space.id] ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}`}
-                onClick={() => handleReserve(space.id)}
+                className={`mt-3 px-4 py-1 rounded font-semibold text-xs transition text-white ${space.reserved === 'true' && space.lastUser === authUser.id ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}`}
+                onClick={() => handleReserve(space)}
               >
-                {reserved[space.id] ? "Cancel Reservation" : "Reserve"}
+                {space.reserved === 'true' && space.lastUser === authUser.id ? "Cancel Reservation" : "Reserve"}
               </button>
             ) : (
               <span className="mt-3 px-4 py-1 bg-gray-400 text-white rounded font-semibold text-xs cursor-not-allowed">
