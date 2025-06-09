@@ -3,14 +3,15 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CentralProvider } from "./contexts";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
-import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import ParkingLots from "./pages/ParkingLots";
 import LotSpaces from "./pages/LotSpaces";
 import ForgotPassword from "./pages/ForgotPassword";
 
+
 function App() {
+
   return (
     <CentralProvider>
       <Router>

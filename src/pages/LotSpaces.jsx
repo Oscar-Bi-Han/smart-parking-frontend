@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { reserveSpace, cancelReservation, fetchSpaces } from "../utils/spacesApi";
+import LogoutButton from "../components/LogoutButton";
 
 const LotSpaces = () => {
   const [loading, setLoading] = useState(true); // Add loading state
@@ -52,7 +53,10 @@ const LotSpaces = () => {
 
   return (
     <div className="py-4">
-      <h2 className="text-2xl md:text-4xl font-bold mb-4">Spaces in Central Plaza</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl md:text-4xl font-bold mb-4">Spaces in Central Plaza</h2>
+        <LogoutButton /> 
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {backendSpaces.map((space) => (
           <div
