@@ -45,7 +45,7 @@ export const AuthUserProvider = ({ children }) => {
     const logout = async () => {
         try {
             setLoading(true);
-            await axios.post(`${API_URL}/auth/logout`,  {}, { withCredentials: true });
+            await axios.post(`${API_URL}/auth/logout`,  null, { withCredentials: true });
             setAuthUser(null);
             toast.success('Logged out!');
         } catch (error) {
