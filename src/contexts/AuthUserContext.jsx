@@ -18,7 +18,7 @@ export const AuthUserProvider = ({ children }) => {
                 setAuthUser(response.data.user);
             } catch (error) {
                 console.error('Error fetching authenticated user:', error);
-                toast.error('Failed to fetch authenticated user. Please try again.');
+                toast.error('Please log in to access the platform.');
                 setAuthUser(null);
             } finally {
                 setLoading(false)
@@ -45,8 +45,9 @@ export const AuthUserProvider = ({ children }) => {
     const logout = async () => {
         try {
             setLoading(true);
-            await axios.post(`${API_URL}/auth/logout`,  { withCredentials: true });
+            await axios.post(`${API_URL}/auth/logout`,  {}, { withCredentials: true });
             setAuthUser(null);
+            toast.success('Logged out!');
         } catch (error) {
             console.error('Logout error:', error);
             toast.error('Logout failed. Please try again.');

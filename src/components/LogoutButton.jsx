@@ -8,7 +8,7 @@ const LogoutButton = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      alert("Logged out successfully!");
+      // alert("Logged out successfully!");
     } catch (error) {
       console.error("Error during logout:", error);
       toast.error('Logout failed. Please try again.');
