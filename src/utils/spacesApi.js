@@ -20,8 +20,9 @@ export const reserveSpace = async (spaceId, userId) => {
     toast.success('Space reserved successfully!');
     return response.data;
   } catch (error) {
-    console.error("Error reserving space:", error);
-    toast.error('Failed to reserve the space. Please try again.');
+    const errorMsg = error.response?.data?.message || error.message || 'Failed to reserve the space. Please try again.';
+    console.error("Error reserving space:", errorMsg);
+    toast.error(errorMsg);
     throw error;
   }
 };

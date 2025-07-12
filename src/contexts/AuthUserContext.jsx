@@ -18,7 +18,7 @@ export const AuthUserProvider = ({ children }) => {
                 setAuthUser(response.data.user);
             } catch (error) {
                 console.error('Error fetching authenticated user:', error);
-                toast.error('Please log in to access the platform.');
+                toast('Please log in to access the platform.', { icon: '✋',});
                 setAuthUser(null);
             } finally {
                 setLoading(false)

@@ -3,12 +3,14 @@ import { reserveSpace, cancelReservation, fetchSpaces } from "../utils/spacesApi
 import LogoutButton from "../components/LogoutButton";
 import { useAuthUser } from "../contexts/AuthUserContext";
 import toast from 'react-hot-toast';
+import ButtonLoader from "../components/ButtonLoader";
 
 const LotSpaces = () => {
   const [loading, setLoading] = useState(true); // Add loading state
   const [reserved, setReserved] = useState({});
   const [backendSpaces, setBackendSpaces] = useState([]);
   const {authUser} = useAuthUser(); 
+  const [buttonLoading, setButtonLoading] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +20,7 @@ const LotSpaces = () => {
         setBackendSpaces(spaces);
       } catch (error) {
         console.error("Error fetching spaces:", error);
-        toast.error('Failed to fetch parking spaces. Please try again.');
+        toast.error(error.message || 'Failed to fetch parking spaces. Please try again.');
       } finally {
         setLoading(false); // Set loading to false after fetching
       }
@@ -40,6 +42,7 @@ const LotSpaces = () => {
   }
 
   const handleReserve = async (space) => {
+    setButtonLoading(space.id);
     try {
       if (space.reserved === 'true' && space.lastUser === authUser.id) {
         await cancelReservation(space.id, authUser.id);
@@ -53,7 +56,8 @@ const LotSpaces = () => {
       setBackendSpaces(updatedSpaces);
     } catch (error) {
       console.error("Error handling reservation:", error);
-      toast.error('Failed to handle reservation. Please try again.');
+    } finally {
+      setButtonLoading(null);
     }
   };
 
@@ -79,10 +83,11 @@ const LotSpaces = () => {
               </span>
             ) : space.status === 0 ? (
               <button
-                className={`mt-3 px-4 py-1 rounded font-semibold text-xs transition text-white ${space.reserved === 'true' && space.lastUser === authUser.id ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}`}
+                className={`mt-3 px-4 py-1 rounded font-semibold text-xs transition cursor-pointer duration-300 text-white ${buttonLoading === space.id ? "bg-green-800" : space.reserved === 'true' && space.lastUser === authUser.id ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-600/90"}`}
                 onClick={() => handleReserve(space)}
+                disabled={buttonLoading === space.id}
               >
-                {space.reserved === 'true' && space.lastUser === authUser.id ? "Cancel Reservation" : "Reserve"}
+                {buttonLoading === space.id ? <ButtonLoader /> : (space.reserved === 'true' && space.lastUser === authUser.id ? "Cancel Reservation" : "Reserve")}
               </button>
             ) : (
               <span className="mt-3 px-4 py-1 bg-gray-400 text-white rounded font-semibold text-xs cursor-not-allowed">
