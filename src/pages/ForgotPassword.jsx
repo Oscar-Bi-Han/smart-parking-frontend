@@ -21,7 +21,7 @@ const ForgotPassword = () => {
     <div className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4">Forgot Password</h1>
       {submitted ? (
-        <p className="text-green-700 text-sm">If an account with that email exists, a password reset link has been sent.</p>
+        <p className="text-green-700 text-sm">If an account with that email exists, a password reset link has been sent.</p> 
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -45,6 +45,13 @@ const ForgotPassword = () => {
           </button>
         </form>
       )}
+      <button
+        type="button"
+        className="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded text-sm sm:text-base font-semibold"
+        onClick={() => window.location.href = "/auth/login"}
+      >
+        Back to Login
+      </button>
     </div>
   );
 };

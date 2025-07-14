@@ -4,6 +4,7 @@ import LogoutButton from "../components/LogoutButton";
 import { useAuthUser } from "../contexts/AuthUserContext";
 import toast from 'react-hot-toast';
 import ButtonLoader from "../components/ButtonLoader";
+import ParkingPrediction from "../components/ParkingPredictionBar";
 
 const LotSpaces = () => {
   const [loading, setLoading] = useState(true); // Add loading state
@@ -97,6 +98,7 @@ const LotSpaces = () => {
           </div>
         ))}
       </div>
+      <ParkingPrediction />
     </div>
   );
 };
