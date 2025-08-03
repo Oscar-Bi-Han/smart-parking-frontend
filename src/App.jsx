@@ -9,6 +9,9 @@ import ParkingLots from "./pages/ParkingLots";
 import LotSpaces from "./pages/LotSpaces";
 import ForgotPassword from "./pages/ForgotPassword";
 import Register from "./pages/Register";
+import AdminLogin from "./pages/AdminLogin";
+import AdminRegister from "./pages/AdminRegister";
+import AdminLogs from "./pages/AdminLogs";
 import { Toaster } from "react-hot-toast";
 
 
@@ -33,6 +36,11 @@ function App() {
             />
             <Route path="/auth/register" element={<Register />} />
           </Route>
+
+          {/* Admin Auth routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          <Route path="/admin/logs" element={<AdminLogs />} />
 
           {/* Catch-all for 404 */}
           <Route path="*" element={<NotFound />} />
