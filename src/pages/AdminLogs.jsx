@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const AdminLogs = () => {
   const [logs, setLogs] = useState([]);
+  const [showOptions, setShowOptions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
@@ -18,8 +19,10 @@ const AdminLogs = () => {
     const fetchLogs = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API}/admin/logs?page=${page}&limit=${limit}`,
-          { credentials: "include" });
+        const res = await fetch(
+          `${API}/admin/logs?page=${page}&limit=${limit}`,
+          { credentials: "include" }
+        );
         if (!res.ok) throw new Error("Failed to fetch logs");
         const data = await res.json();
         setLogs(data.logs || []);
@@ -45,30 +48,111 @@ const AdminLogs = () => {
     }
   };
 
+  // Download current page logs as PDF
+  function handleDownloadPDF(logsToDownload, pageNum) {
+    const doc = new jsPDF();
+    doc.text(`Parking Logs - Page ${pageNum}`, 14, 15);
+    autoTable(doc, {
+      startY: 25,
+      head: [["Sensor", "Status", "Timestamp"]],
+      body: logsToDownload.map((log) => [
+        log.sensor,
+        log.status,
+        log.timestamp,
+      ]),
+    });
+    doc.save(`parking_logs_page_${pageNum}.pdf`);
+  }
+
+  // Download all logs as PDF
+  async function handleDownloadAllPDF() {
+    try {
+      const res = await fetch(`${API}/admin/logs?page=1&limit=100000`, {
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to fetch all logs");
+      const data = await res.json();
+      const allLogs = data.logs || [];
+      const doc = new jsPDF();
+      doc.text("Parking Logs - All", 14, 15);
+      autoTable(doc, {
+        startY: 25,
+        head: [["Sensor", "Status", "Timestamp"]],
+        body: allLogs.map((log) => [log.sensor, log.status, log.timestamp]),
+      });
+      doc.save("parking_logs_all.pdf");
+    } catch (err) {
+      alert("Failed to download all logs as PDF.");
+    }
+  }
+
+  window.addEventListener("click", () => setShowOptions(false));
+
   return (
-    <div className="max-w-4xl mx-auto mt-8 mb-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-4xl mx-auto mt-4 mb-8 px-2 sm:px-4">
+      <div className="flex justify-between items-center gap-4 mb-3 py-4">
         <h1 className="text-3xl font-bold">Parking Logs</h1>
-        <div className="flex gap-2">
+        {/* Collapsible download options for mobile */}
+        <div className="w-max sm:hidden relative">
           <button
-            onClick={() => handleDownloadPDF(logs, page)}
+            className="w-max bg-gray-100 px-4 py-2 rounded font-medium text-gray-700 focus:outline-none flex justify-between items-center"
+            onClick={(e) => { setShowOptions((v) => !v); e.stopPropagation(); }}
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded={showOptions}
+          >
+            Options
+            <svg className={`ml-2 transition-transform ${showOptions ? 'rotate-180' : ''}`} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          <div
+            className={`absolute right-0 z-20 w-max bg-white border border-gray-200 rounded shadow transition-opacity duration-200 ${showOptions ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} origin-top mt-1`}
+            role="listbox"
+          >
+            <div
+              className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-800"
+              onClick={(e) => { handleDownloadPDF(logs, page); setShowOptions(false); e.stopPropagation(); }}
+              role="option"
+            >
+              Download Current Page (PDF)
+            </div>
+            <div
+              className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-800"
+              onClick={(e) => { handleDownloadAllPDF(); setShowOptions(false); e.stopPropagation(); }}
+              role="option"
+            >
+              Download All Logs (PDF)
+            </div>
+            <div
+              className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-red-600"
+              onClick={(e) => { handleLogout(); setShowOptions(false); e.stopPropagation(); }}
+              role="option"
+            >
+              Logout
+            </div>
+          </div>
+        </div>
+        {/* Download options for desktop */}
+        <div className="hidden sm:flex flex-row gap-2 w-max sm:w-auto">
+          <button
+            onClick={(e) => { handleDownloadPDF(logs, page); e.stopPropagation(); }}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
             Download Current Page (PDF)
           </button>
           <button
-            onClick={handleDownloadAllPDF}
+            onClick={(e) => { handleDownloadAllPDF(); e.stopPropagation(); }}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Download All Logs (PDF)
           </button>
           <button
-            onClick={handleLogout}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            onClick={(e) => { handleLogout(); e.stopPropagation(); }}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-2 sm:mt-0"
           >
             Logout
           </button>
         </div>
+        {/* Logout button always visible */}
       </div>
       {loading ? (
         <div className="flex items-center justify-center">
@@ -79,7 +163,7 @@ const AdminLogs = () => {
       ) : logs.length === 0 ? (
         <div>No logs found.</div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-md border border-gray-200">
           <table className="min-w-full bg-white border border-gray-300">
             <thead>
               <tr>
@@ -109,7 +193,9 @@ const AdminLogs = () => {
         >
           Previous
         </button>
-        <span className="px-2 py-1">Page {page} of {Math.max(1, Math.ceil(total / limit))}</span>
+        <span className="px-2 py-1">
+          Page {page} of {Math.max(1, Math.ceil(total / limit))}
+        </span>
         <button
           onClick={() => setPage((p) => p + 1)}
           disabled={page * limit >= total}
@@ -120,38 +206,6 @@ const AdminLogs = () => {
       </div>
     </div>
   );
-};
-
-// Download current page logs as PDF
-const handleDownloadPDF = (logsToDownload, pageNum) => {
-  const doc = new jsPDF();
-  doc.text(`Parking Logs - Page ${pageNum}`, 14, 15);
-  autoTable(doc, {
-    startY: 25,
-    head: [["Sensor", "Status", "Timestamp"]],
-    body: logsToDownload.map((log) => [log.sensor, log.status, log.timestamp]),
-  });
-  doc.save(`parking_logs_page_${pageNum}.pdf`);
-};
-
-// Download all logs as PDF
-const handleDownloadAllPDF = async () => {
-  try {
-    const res = await fetch(`${API}/admin/logs?page=1&limit=100000`, { credentials: "include" });
-    if (!res.ok) throw new Error("Failed to fetch all logs");
-    const data = await res.json();
-    const allLogs = data.logs || [];
-    const doc = new jsPDF();
-    doc.text("Parking Logs - All", 14, 15);
-    autoTable(doc, {
-      startY: 25,
-      head: [["Sensor", "Status", "Timestamp"]],
-      body: allLogs.map((log) => [log.sensor, log.status, log.timestamp]),
-    });
-    doc.save("parking_logs_all.pdf");
-  } catch (err) {
-    alert("Failed to download all logs as PDF.");
-  }
 };
 
 export default AdminLogs;

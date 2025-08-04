@@ -45,8 +45,8 @@ const AdminLogin = () => {
   const isFormValid = validateEmail(email) && password.length >= 6;
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
-      <h1 className="text-3xl font-bold mt-5 mb-5">Admin Login</h1>
+    <form onSubmit={handleSubmit} className="w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto px-4 py-8 bg-white rounded-lg shadow-md flex flex-col gap-2 sm:gap-4 mt-10 mb-10">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Admin Login</h1>
       <div className="mb-4">
         <label htmlFor="email" className="block mb-2 font-medium ">Email</label>
         <input id="email" type="email" className="w-full border rounded px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-400" value={email} onChange={(e) => setEmail(e.target.value)} required />
