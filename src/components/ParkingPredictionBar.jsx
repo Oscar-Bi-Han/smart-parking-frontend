@@ -59,7 +59,7 @@ const ParkingPrediction = () => {
           {error && <p className="text-red-500">{error}</p>}
           {prediction && (
             <div className="text-gray-800">
-              <p><strong>Percentage:</strong> {prediction.occupancy_percentage}% of the lot may be occupied</p>
+              <p><strong>Prediction:</strong> {Math.round((prediction.occupancy_percentage / 100) * 4)} out of 4 spaces will be occupied</p>
             </div>
           )}
         </div>
